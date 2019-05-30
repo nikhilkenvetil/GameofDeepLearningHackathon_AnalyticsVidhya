@@ -183,7 +183,6 @@ x_train /= 255
 model_fit = model.fit(x_train, dummy_y, batch_size = 100, epochs = 100, verbose = 1, validation_split = .2)
 
 scores = model.evaluate(x_train, dummy_y, verbose=0)
-print("%s: %.2f%%" % (model.metrics_names[0], scores[1]*100))
 print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 
 #Plot of Loss
