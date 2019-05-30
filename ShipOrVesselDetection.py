@@ -144,6 +144,16 @@ model.add(
 #Maxpooling layer
 model.add(MaxPooling2D(pool_size = (2, 2)))
 
+#Third convoluation layer
+model.add(
+    Conv2D(
+        128, 
+        (3, 3), 
+        activation = 'relu'))
+
+#Maxpooling layer
+model.add(MaxPooling2D(pool_size = (2, 2)))
+
 model.add(Flatten())
 
 #Hidden layers
@@ -243,4 +253,4 @@ for i in range(len(test)):
 test["category"] = y_hat
 
 #Importing df to csv
-test.to_csv("Predictions.csv", index = False)
+test.to_csv("Predictions01.csv", index = False)
