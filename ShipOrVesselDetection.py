@@ -147,24 +147,29 @@ model.add(MaxPooling2D(pool_size = (2, 2)))
 model.add(Flatten())
 
 #Hidden layers
-model.add(Dense(50, activation = "tanh", kernel_initializer ='uniform'))
+#Initializations define the way to set the initial random weights of Keras layers.
+model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
 model.add(BatchNormalization())
 model.add(Dropout(.25))
-model.add(Dense(50, activation = "tanh", kernel_initializer ='uniform'))
+model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
 model.add(BatchNormalization())
 model.add(Dropout(.25))
-model.add(Dense(50, activation = "tanh", kernel_initializer ='uniform'))
+model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
 model.add(BatchNormalization())
 model.add(Dropout(.25))
-model.add(Dense(50, activation = "tanh", kernel_initializer ='uniform'))
+model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
 model.add(BatchNormalization())
 model.add(Dropout(.25))
-#model.add(Dense(50, activation = "tanh"))
-#model.add(Dense(50, activation = "tanh"))
-model.add(Dense(50, activation = "tanh", kernel_initializer ='uniform'))
+model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
 model.add(BatchNormalization())
 model.add(Dropout(.25))
-model.add(Dense(50, activation = "tanh", kernel_initializer ='uniform'))
+model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(BatchNormalization())
+model.add(Dropout(.25))
+model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(BatchNormalization())
+model.add(Dropout(.25))
+model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
 model.add(BatchNormalization())
 model.add(Dropout(.25))
 #output layer
@@ -180,7 +185,7 @@ model.summary()
 x_train = x_train.astype('float32')
 x_train /= 255
 
-model_fit = model.fit(x_train, dummy_y, batch_size = 100, epochs = 100, verbose = 1, validation_split = .2)
+model_fit = model.fit(x_train, dummy_y, batch_size = 100, epochs = 150, verbose = 1, validation_split = .2)
 
 scores = model.evaluate(x_train, dummy_y, verbose=0)
 print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
@@ -207,11 +212,11 @@ plt.show()
 
 #Saving the mode:
 model_json = model.to_json()
-with open("model.json", "w") as json_file:
+with open("model01.json", "w") as json_file:
     json_file.write(model_json)
 
 #Serialize weights to HDF5
-model.save_weights("model_weights.h5")
+model.save_weights("model_weights01.h5")
 print("Saved model to disk")
 
 #The testing part
@@ -235,7 +240,7 @@ for i in range(len(test)):
     print(f"{test.image[i]} - {y_hat[i]}")
     
 #Adding a new column to the test df, called 'predictions'
-test["predictions"] = y_hat
+test["category"] = y_hat
 
 #Importing df to csv
-test.to_csv("Predictions.csv")
+test.to_csv("Predictions.csv", index = False)
