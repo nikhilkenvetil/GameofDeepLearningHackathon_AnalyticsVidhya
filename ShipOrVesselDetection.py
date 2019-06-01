@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import statistics 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import confusion_matrix,accuracy_score, roc_curve, auc
+from sklearn.metrics import confusion_matrix, accuracy_score, roc_curve, auc
 from tqdm import tqdm #Used to display a progress bar
 
 from PIL import Image
@@ -140,6 +140,8 @@ model.add(
         64, 
         (3, 3), 
         activation = 'relu'))
+model.add(BatchNormalization())
+model.add(Dropout(.25))
 
 #Maxpooling layer
 model.add(MaxPooling2D(pool_size = (2, 2)))
@@ -147,9 +149,20 @@ model.add(MaxPooling2D(pool_size = (2, 2)))
 #Third convoluation layer
 model.add(
     Conv2D(
+        64, 
+        (3, 3), 
+        activation = 'relu'))
+model.add(BatchNormalization())
+model.add(Dropout(.25))
+
+#Fourth convoluation layer
+model.add(
+    Conv2D(
         128, 
         (3, 3), 
         activation = 'relu'))
+model.add(BatchNormalization())
+model.add(Dropout(.25))
 
 #Maxpooling layer
 model.add(MaxPooling2D(pool_size = (2, 2)))
@@ -158,35 +171,57 @@ model.add(Flatten())
 
 #Hidden layers
 #Initializations define the way to set the initial random weights of Keras layers.
-model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(Dense(xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
 model.add(BatchNormalization())
 model.add(Dropout(.25))
-model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(Dense(xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
 model.add(BatchNormalization())
 model.add(Dropout(.25))
-model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(Dense(xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
 model.add(BatchNormalization())
 model.add(Dropout(.25))
-model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(Dense(2*xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(BatchNormalization())
+model.add(Dropout(.35))
+model.add(Dense(2*xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(BatchNormalization())
+model.add(Dropout(.35))
+model.add(Dense(2*xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(BatchNormalization())
+model.add(Dropout(.35))
+model.add(Dense(3*xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(BatchNormalization())
+model.add(Dropout(.35))
+model.add(Dense(3*xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(BatchNormalization())
+model.add(Dropout(.35))
+model.add(Dense(4*xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(BatchNormalization())
+model.add(Dropout(.45))
+model.add(Dense(5*xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(BatchNormalization())
+model.add(Dropout(.45))
+model.add(Dense(4*xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(BatchNormalization())
+model.add(Dropout(.45))
+model.add(Dense(3*xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(BatchNormalization())
+model.add(Dropout(.35))
+model.add(Dense(2*xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(BatchNormalization())
+model.add(Dropout(.35))
+model.add(Dense(2*xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
 model.add(BatchNormalization())
 model.add(Dropout(.25))
-model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
+model.add(Dense(xmin, activation = "relu", kernel_initializer ='random_uniform', bias_initializer='zeros'))
 model.add(BatchNormalization())
 model.add(Dropout(.25))
-model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
-model.add(BatchNormalization())
-model.add(Dropout(.25))
-model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
-model.add(BatchNormalization())
-model.add(Dropout(.25))
-model.add(Dense(50, activation = "tanh", kernel_initializer ='random_uniform', bias_initializer='zeros'))
-model.add(BatchNormalization())
-model.add(Dropout(.25))
+
 #output layer
 model.add(Dense(5, activation = 'sigmoid'))
 
-sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-model.compile(loss = "categorical_crossentropy", optimizer = sgd, metrics = ['accuracy'])
+adam = optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False) #Default value per the paper (from Keras documentation)
+model.compile(loss = "categorical_crossentropy", optimizer = adam, metrics = ['accuracy'])
 
 model.summary()
 
@@ -195,7 +230,7 @@ model.summary()
 x_train = x_train.astype('float32')
 x_train /= 255
 
-model_fit = model.fit(x_train, dummy_y, batch_size = 100, epochs = 150, verbose = 1, validation_split = .2)
+model_fit = model.fit(x_train, dummy_y, batch_size = 100, epochs = 200, verbose = 1, validation_split = .2)
 
 scores = model.evaluate(x_train, dummy_y, verbose=0)
 print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
@@ -222,11 +257,11 @@ plt.show()
 
 #Saving the mode:
 model_json = model.to_json()
-with open("model01.json", "w") as json_file:
+with open("model02.json", "w") as json_file:
     json_file.write(model_json)
 
 #Serialize weights to HDF5
-model.save_weights("model_weights01.h5")
+model.save_weights("model_weights02.h5")
 print("Saved model to disk")
 
 #The testing part
@@ -253,4 +288,4 @@ for i in range(len(test)):
 test["category"] = y_hat
 
 #Importing df to csv
-test.to_csv("Predictions01.csv", index = False)
+test.to_csv("Predictions02.csv", index = False)
